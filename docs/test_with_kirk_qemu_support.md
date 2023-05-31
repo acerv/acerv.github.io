@@ -18,22 +18,21 @@ how to use [kirk] in order to run a testing framework on linux kernel.
 
 ## Testing framework
 
-We will consider using [LTP] that we know being a testing suite which could
-easily freeze a kernel version.
-
+We will consider using [LTP], as we know it could crash our kernel.
 First of all, each [kirk] framework must implement
 [Framework](https://github.com/acerv/kirk/blob/master/libkirk/framework.py)
-class and its definition must be placed inside the libkirk folder.
-
+class and its definition must be placed inside the
+[libkirk](https://github.com/acerv/kirk/blob/master/libkirk) folder.
 Framework implementation for [LTP] can be found
-[`here`](https://github.com/acerv/kirk/blob/master/libkirk/ltp.py).
+[here](https://github.com/acerv/kirk/blob/master/libkirk/ltp.py).
 
 A typical [LTP] execution *on host* via [kirk] can be done as following:
 
         kirk -f ltp:root=/opt/ltp -r syscalls
 
-But this execution doesn't provide a control over Kernel panic, oops, freeze,
-etc, so we need to build initrd/kernel images in order to run tests via [Qemu].
+But it doesn't provide any control over Kernel panic, oops, freeze, etc.
+For this reason we need to build fs/kernel images in order to run tests via
+[Qemu].
 
 ## Build image with buildroot
 
@@ -72,22 +71,22 @@ can be used:
 
 ## Executing kirk
 
-Now that we have both initrafs and kernel images, we can use [kirk] to run
-commands inside virtual machine.
+Now that we have both FS and kernel images, we can use [kirk] to run commands
+inside virtual machine.
 
         export IMAGE=$BUILDROOT/output/images/rootfs.ext2
         export KERNEL=$BUILDROOT/output/images/bzImage
 
         kirk -s qemu:image=$IMAGE:kernel=$KERNEL:user=root:prompt='# ':options='-append "rootwait root=/dev/vda console=ttyS0" -net nic,model=virtio -net user' \
-             -c "ls -la" \
+             -c "ls -la /" \
              -v
 
-Notice that we specified `prompt='# '`, since first busybox prompt string is
-`# `. This is really important because first prompt is used by [kirk] to
-recognize if we logged in.
+Notice that we specified `prompt='# '`, since the first busybox prompt string is
+`# `. This is really important because first prompt string is used by [kirk] to
+recognize if we logged in or not.
 
 The option `-append "rootwait root=/dev/vda console=ttyS0"` is needed to tell
-kernel what is our root device and what is our console,
+kernel what is our root device and what is our serial console,
 `-net nic,model=virtio -net user` is needed in order to communicate with
 network.
 
@@ -119,7 +118,7 @@ Command output will be the following:
         0-pQlWoxTSyF
         Exit code: 0
 
-In the next execution we will run LTP using kirk:
+Now we are ready to run an [LTP] testing suite using kirk:
 
         export IMAGE=$BUILDROOT/output/images/rootfs.ext2
         export KERNEL=$BUILDROOT/output/images/bzImage
@@ -129,8 +128,7 @@ In the next execution we will run LTP using kirk:
              -r syscalls \
              -v
 
-If everything is fine, we should properly see [LTP] syscalls testing suite
-execution.
+If everything is fine, we will see the running [LTP] syscalls testing suite.
 
 [kirk]: https://github.com/acerv/kirk
 [LTP]: https://github.com/linux-test-project/ltp
