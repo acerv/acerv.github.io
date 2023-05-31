@@ -75,10 +75,10 @@ can be used:
 Now that we have both initrafs and kernel images, we can use [kirk] to run
 commands inside virtual machine.
 
-        export INITRD=<initramfs path>
-        export KERNEL=<kernel path>
+        export IMAGE=$BUILDROOT/output/images/rootfs.ext2
+        export KERNEL=$BUILDROOT/output/images/bzImage
 
-        kirk -s qemu:initrd=$INITRD:kernel=$KERNEL:user=root:prompt='# ':options='-append "rootwait root=/dev/vda console=ttyS0" -net nic,model=virtio -net user' \
+        kirk -s qemu:image=$IMAGE:kernel=$KERNEL:user=root:prompt='# ':options='-append "rootwait root=/dev/vda console=ttyS0" -net nic,model=virtio -net user' \
              -c "ls -la" \
              -v
 
@@ -121,11 +121,11 @@ Command output will be the following:
 
 In the next execution we will run LTP using kirk:
 
-        export INITRD=<initramfs path>
-        export KERNEL=<kernel path>
+        export IMAGE=$BUILDROOT/output/images/rootfs.ext2
+        export KERNEL=$BUILDROOT/output/images/bzImage
 
         kirk -f ltp:root=/usr/lib/ltp-testsuite \
-             -s qemu:initrd=$INITRD:kernel=$KERNEL:user=root:prompt='# ':options='-append "rootwait root=/dev/vda console=ttyS0" -net nic,model=virtio -net user' \
+             -s qemu:image=$IMAGE:kernel=$KERNEL:user=root:prompt='# ':options='-append "rootwait root=/dev/vda console=ttyS0" -net nic,model=virtio -net user' \
              -r syscalls \
              -v
 
