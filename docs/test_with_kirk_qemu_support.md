@@ -28,7 +28,7 @@ Framework implementation for [LTP] can be found
 
 A typical [LTP] execution *on host* via [kirk] can be done as following:
 
-        kirk -f ltp:root=/opt/ltp -r syscalls
+    kirk -f ltp:root=/opt/ltp -r syscalls
 
 But it doesn't provide any control over Kernel panic, oops, freeze, etc.
 For this reason we need to build fs/kernel images in order to run tests via
@@ -40,46 +40,46 @@ For this reason we need to build fs/kernel images in order to run tests via
 by [Qemu]. Our minimum requirement is `gcc >= 8`, then we can start building
 our images with the following commands:
 
-        cd $BUILDROOT
-        make qemu_x86_64_defconfig
-        make menuconfig
+    cd $BUILDROOT
+    make qemu_x86_64_defconfig
+    make menuconfig
 
 We need to install LTP inside the buildroot image (notice that we need to give
 enough space to FS image, since we have LTP installed):
 
-        Host utilities ->
-                host qemu -> yes
-                Virtual filesystem support -> yes
+    Host utilities ->
+        host qemu -> yes
+        Virtual filesystem support -> yes
 
-        Target packages ->
-                Debugging, profiling and benchmark ->
-                ltp-testsuite -> yes
+    Target packages ->
+        Debugging, profiling and benchmark ->
+        ltp-testsuite -> yes
 
-        Filesystem images ->
-                exact size -> 500MB
+    Filesystem images ->
+        exact size -> 500MB
 
 Then we can build the images:
 
-        make -j16
+    make -j16
 
 Sometimes `gcc-11` compile causes some errors. In this case, `gcc-12`
 can be used:
 
-        Toolchain ->
-                GCC compiler Version (gcc 12.x) ->
-                gcc 12.x -> yes
+    Toolchain ->
+        GCC compiler Version (gcc 12.x) ->
+        gcc 12.x -> yes
 
 ## Executing kirk
 
 Now that we have both FS and kernel images, we can use [kirk] to run commands
 inside virtual machine.
 
-        export IMAGE=$BUILDROOT/output/images/rootfs.ext2
-        export KERNEL=$BUILDROOT/output/images/bzImage
+    export IMAGE=$BUILDROOT/output/images/rootfs.ext2
+    export KERNEL=$BUILDROOT/output/images/bzImage
 
-        kirk -s qemu:image=$IMAGE:kernel=$KERNEL:user=root:prompt='# ':options='-append "rootwait root=/dev/vda console=ttyS0" -net nic,model=virtio -net user' \
-             -c "ls -la /" \
-             -v
+    kirk -s qemu:image=$IMAGE:kernel=$KERNEL:user=root:prompt='# ':options='-append "rootwait root=/dev/vda console=ttyS0" -net nic,model=virtio -net user' \
+         -c "ls -la /" \
+         -v
 
 Notice that we specified `prompt='# '`, since the first busybox prompt string is
 `# `. This is really important because first prompt string is used by [kirk] to
@@ -92,41 +92,41 @@ network.
 
 Command output will be the following:
 
-        ls -la /
+    ls -la /
 
-        total 25
-        drwxr-xr-x   18 root     root          1024 May 31 12:08 .
-        drwxr-xr-x   18 root     root          1024 May 31 12:08 ..
-        drwxr-xr-x    2 root     root          2048 May 31 12:08 bin
-        drwxr-xr-x    8 root     root         12280 May 31 12:09 dev
-        drwxr-xr-x    5 root     root          1024 May 31 12:08 etc
-        drwxr-xr-x    3 root     root          1024 May 31 12:08 lib
-        lrwxrwxrwx    1 root     root             3 May 31 11:43 lib64 -> lib
-        lrwxrwxrwx    1 root     root            11 May 31 11:59 linuxrc -> bin/busybox
-        drwx------    2 root     root         12288 May 31 12:08 lost+found
-        drwxr-xr-x    2 root     root          1024 May  9 20:38 media
-        drwxr-xr-x    2 root     root          1024 May  9 20:38 mnt
-        drwxr-xr-x    2 root     root          1024 May  9 20:38 opt
-        dr-xr-xr-x   99 root     root             0 May 31 12:09 proc
-        drwx------    2 root     root          1024 May 31 12:09 root
-        drwxr-xr-x    4 root     root           180 May 31 12:09 run
-        drwxr-xr-x    2 root     root          1024 May 31 11:59 sbin
-        dr-xr-xr-x   12 root     root             0 May 31 12:09 sys
-        drwxrwxrwt    2 root     root            80 May 31 12:09 tmp
-        drwxr-xr-x    6 root     root          1024 May 31 12:08 usr
-        drwxr-xr-x    4 root     root          1024 May 31 12:08 var
-        0-pQlWoxTSyF
-        Exit code: 0
+    total 25
+    drwxr-xr-x   18 root     root      1024 May 31 12:08 .
+    drwxr-xr-x   18 root     root      1024 May 31 12:08 ..
+    drwxr-xr-x    2 root     root      2048 May 31 12:08 bin
+    drwxr-xr-x    8 root     root     12280 May 31 12:09 dev
+    drwxr-xr-x    5 root     root      1024 May 31 12:08 etc
+    drwxr-xr-x    3 root     root      1024 May 31 12:08 lib
+    lrwxrwxrwx    1 root     root         3 May 31 11:43 lib64 -> lib
+    lrwxrwxrwx    1 root     root        11 May 31 11:59 linuxrc -> bin/busybox
+    drwx------    2 root     root     12288 May 31 12:08 lost+found
+    drwxr-xr-x    2 root     root      1024 May  9 20:38 media
+    drwxr-xr-x    2 root     root      1024 May  9 20:38 mnt
+    drwxr-xr-x    2 root     root      1024 May  9 20:38 opt
+    dr-xr-xr-x   99 root     root         0 May 31 12:09 proc
+    drwx------    2 root     root      1024 May 31 12:09 root
+    drwxr-xr-x    4 root     root       180 May 31 12:09 run
+    drwxr-xr-x    2 root     root      1024 May 31 11:59 sbin
+    dr-xr-xr-x   12 root     root         0 May 31 12:09 sys
+    drwxrwxrwt    2 root     root        80 May 31 12:09 tmp
+    drwxr-xr-x    6 root     root      1024 May 31 12:08 usr
+    drwxr-xr-x    4 root     root      1024 May 31 12:08 var
+    0-pQlWoxTSyF
+    Exit code: 0
 
 Now we are ready to run an [LTP] testing suite using kirk:
 
-        export IMAGE=$BUILDROOT/output/images/rootfs.ext2
-        export KERNEL=$BUILDROOT/output/images/bzImage
+    export IMAGE=$BUILDROOT/output/images/rootfs.ext2
+    export KERNEL=$BUILDROOT/output/images/bzImage
 
-        kirk -f ltp:root=/usr/lib/ltp-testsuite \
-             -s qemu:image=$IMAGE:kernel=$KERNEL:user=root:prompt='# ':options='-append "rootwait root=/dev/vda console=ttyS0" -net nic,model=virtio -net user' \
-             -r syscalls \
-             -v
+    kirk -f ltp:root=/usr/lib/ltp-testsuite \
+         -s qemu:image=$IMAGE:kernel=$KERNEL:user=root:prompt='# ':options='-append "rootwait root=/dev/vda console=ttyS0" -net nic,model=virtio -net user' \
+         -r syscalls \
+         -v
 
 If everything is fine, we will see the running [LTP] syscalls testing suite.
 
